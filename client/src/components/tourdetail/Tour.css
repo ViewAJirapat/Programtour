@@ -1,0 +1,11 @@
+body {
+    margin: 0px;
+    background-color: gainsboro;
+  }
+.tour {
+    margin-top: 10px;
+  }
+.box{
+  align-items: center;
+}
+  
