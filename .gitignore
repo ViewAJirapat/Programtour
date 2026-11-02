@@ -138,3 +138,6 @@ GitHub.sublime-settings
 !.vscode/extensions.json 
 .history
 node_modules
+
+# keys and secrets never go in the repo
+*.pem
