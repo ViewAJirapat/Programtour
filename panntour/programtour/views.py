@@ -89,6 +89,13 @@ class UserBookingViewSet(viewsets.ModelViewSet):
     queryset = UserBooking.objects.all()
     serializer_class = UserBookingSerializer
 
+    def get_queryset(self):
+        bookings = UserBooking.objects.all().order_by('id')
+        userid = self.request.query_params.get('userid')
+        if userid:
+            bookings = bookings.filter(userid=userid)
+        return bookings
+
 class UserRefundViewset(viewsets.ModelViewSet):
     authentication_classes = [CsrfExemptSessionAuthentication, BasicAuthentication]
     permission_classes = [AllowAny]
