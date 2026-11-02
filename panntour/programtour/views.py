@@ -186,33 +186,34 @@ def deleteTourDetail(request):
     else:
         return Response({'Not Found TourDetail'})
 
-@api_view(['POST'])  #เพิ่มข้อมูลใน database
+@api_view(['POST'])
 @authentication_classes([CsrfExemptSessionAuthentication, BasicAuthentication])
 @permission_classes([AllowAny])
 def addTourBooking(request):
-    data = request.data
-    Buserid = data['userid']
-    Btourname = data['tourname']
-    Bbookingdate = data['bookingdate']
-    Buser_name_booking = data['user_name_booking']
-    Buser_surname_booking = data['user_surname_booking']
-    Btourid = data['tourid']
-    Bchild_count = data['child_count']
-    Badult_count = data['adult_count']
-    Buser_phonenumber_booking = data['user_phonenumber_booking']
-    Btourprice = data['tourprice']
-    Bpaymentstatus = data['paymentstatus']
-    Bpay_date = data['pay_date']
-    Bpay_value = data['pay_value']
-    Bslippaymentimage = data['slippaymentimage']
-    Bbookingstatus = data['bookingstatus']
-    Bbankname = data['bankname']
-    Bbanknumber = data['banknumber']
-    Brefundstatus = data['refundstatus']
-    Brefundslipimage = data['refundslipimage']
-    
-    UserBooking.objects.create(userid=Buserid, tourname=Btourname, bookingdate=Bbookingdate, user_name_booking=Buser_name_booking, user_surname_booking=Buser_surname_booking,
-    tourid=Btourid, child_count=Bchild_count, adult_count=Badult_count, user_phonenumber_booking=Buser_phonenumber_booking, tourprice=Btourprice, paymentstatus=Bpaymentstatus, 
-    pay_date=Bpay_date, pay_value=Bpay_value, slippaymentimage=Bslippaymentimage, bookingstatus=Bbookingstatus, bankname=Bbankname, banknumber=Bbanknumber,
-    refundstatus=Brefundstatus, refundslipimage=Brefundslipimage)
-    return Response({'OK'})
+    names = ['userid', 'tourname', 'bookingdate', 'user_name_booking',
+             'user_surname_booking', 'tourid', 'child_count', 'adult_count',
+             'user_phonenumber_booking', 'tourprice']
+    clean = {}
+    for name in names:
+        value = request.data.get(name)
+        if value in ('null', 'undefined'):
+            value = None
+        clean[name] = value
+
+    if clean['child_count'] is None or clean['child_count'] == '':
+        clean['child_count'] = 0
+
+    clean['paymentstatus'] = '0'
+    clean['bookingstatus'] = '0'
+
+    serializer = UserBookingSerializer(data=clean)
+    if not serializer.is_valid():
+        return Response(serializer.errors, status=400)
+
+    if serializer.validated_data['adult_count'] < 1:
+        return Response({'detail': 'adult_count must be at least 1'}, status=400)
+    if serializer.validated_data['child_count'] < 0:
+        return Response({'detail': 'child_count must not be negative'}, status=400)
+
+    booking = serializer.save()
+    return Response({'id': booking.id}, status=201)
