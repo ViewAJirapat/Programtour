@@ -50,26 +50,36 @@ def userRegister(request):
 @permission_classes([AllowAny])
 def adminLogin(request, format=None):
     data = request.data
-    PadminUser = data['adminuser']
-    PadminPassword = data['adminpassword']
-    AdminID = AdminInfomation.objects.filter(adminuser=PadminUser, adminpassword=PadminPassword)
-    for each in AdminID:
-        IdAdmin = each.id
-        print(IdAdmin)
-    return Response(IdAdmin)
+    PadminUser = data.get('adminuser')
+    PadminPassword = data.get('adminpassword')
+    
+    if not PadminUser or not PadminPassword:
+        return Response({'detail': 'adminuser and adminpassword are required'}, status=400)
+    
+    AdminID = AdminInfomation.objects.filter(adminuser=PadminUser, adminpassword=PadminPassword).first()
+    
+    if not AdminID:
+        return Response({'detail': 'invalid credentials'}, status=401)
+    
+    return Response(AdminID.id)
 
 @api_view(['POST'])
 @authentication_classes([CsrfExemptSessionAuthentication, BasicAuthentication])
 @permission_classes([AllowAny])
 def userLogin(request):
     data = request.data
-    Pusername = data['username']
-    Ppassword = data['password']
-    UserID = UserInformation.objects.filter(username=Pusername, password=Ppassword)
-    for each in UserID:
-        IdUser = each.id
-        print(IdUser)
-    return Response(IdUser)
+    Pusername = data.get('username')
+    Ppassword = data.get('password')
+    
+    if not Pusername or not Ppassword:
+        return Response({'detail': 'username and password are required'}, status=400)
+    
+    UserID = UserInformation.objects.filter(username=Pusername, password=Ppassword).first()
+    
+    if not UserID:
+        return Response({'detail': 'invalid credentials'}, status=401)
+    
+    return Response(UserID.id)
 
 
 
@@ -206,6 +216,3 @@ def addTourBooking(request):
     pay_date=Bpay_date, pay_value=Bpay_value, slippaymentimage=Bslippaymentimage, bookingstatus=Bbookingstatus, bankname=Bbankname, banknumber=Bbanknumber,
     refundstatus=Brefundstatus, refundslipimage=Brefundslipimage)
     return Response({'OK'})
-
-
-
