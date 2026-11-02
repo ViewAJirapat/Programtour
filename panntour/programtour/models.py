@@ -1,11 +1,5 @@
-from random import choices
-from tkinter import CASCADE
-from turtle import title
 from django.db import models
-from django.forms import IntegerField
-
 from modelcluster.fields import ParentalKey
-
 from wagtail.core.models import Page, Orderable
 from wagtail.core.fields import RichTextField
 from wagtail.admin.edit_handlers import FieldPanel, MultiFieldPanel, InlinePanel
@@ -28,26 +22,28 @@ class UserInformation(models.Model):
 class UserBooking(models.Model):
     userid = models.TextField(max_length=100, blank=False, null=False)
     tourname = models.CharField(max_length=255, blank=False, null=False)
-    bookingdate = models.DateField(blank = False, null=False)
+    bookingdate = models.DateField(blank=False, null=False)
     user_name_booking = models.TextField(max_length=100, blank=False, null=False)
     user_surname_booking = models.TextField(max_length=20, blank=False, null=False)
-    tourid = models.TextField(max_length=10, blank=False, null=False)
+    tourid = models.CharField(max_length=255, blank=False, null=False)
     child_count = models.IntegerField(blank=False, null=False)
     adult_count = models.IntegerField(blank=False, null=False)
     user_phonenumber_booking = models.TextField(max_length=10, blank=False, null=False)
     tourprice = models.IntegerField(blank=False, null=False)
     paymentstatus = models.CharField(
         max_length=255,
-        choices=[('0', 'ยังไม่ดำเนินการชำระเงิน'), ('1', 'ชำระเงินเรียบร้อยแล้ว')]
+        choices=[('0', 'ยังไม่ดำเนินการชำระเงิน'), ('1', 'ชำระเงินเรียบร้อยแล้ว')],
+        default='0'
     )
-    pay_date = models.DateField(blank = True, null=True)
-    pay_time = models.CharField(max_length=20, blank = True, null=True)
+    pay_date = models.DateField(blank=True, null=True)
+    pay_time = models.CharField(max_length=20, blank=True, null=True)
     pay_value = models.IntegerField(blank=True, null=True)
-    slippaymentimage = models.ImageField(upload_to = 'slip_paymentimage', blank=True, null=True)
+    slippaymentimage = models.ImageField(upload_to='slip_paymentimage', blank=True, null=True)
     bookingstatus = models.CharField(
         max_length=255,
         choices=[('0', 'จอง'), ('1', 'ยกเลิกการจอง')],
-        default = "จอง")
+        default='0'
+    )
     bankname = models.CharField(max_length=20, blank=True, null=True)
     banknumber = models.CharField(max_length=20, blank=True, null=True)
     refundstatus = models.CharField(
@@ -55,12 +51,12 @@ class UserBooking(models.Model):
         choices=[('0', 'ยังไม่ดำเนินการ'), ('1', 'ดำเนินการเรียบร้อยแล้ว')],
         blank=True, null=True
     )
-    refundslipimage = models.ImageField(upload_to = 'refundslip', blank=True, null=True)
+    refundslipimage = models.ImageField(upload_to='refundslip', blank=True, null=True)
 
 
 class UserRefund(models.Model):
     userid = models.TextField(max_length=100, blank=False, null=False)
-    tourid =  models.TextField(max_length=10, blank=False, null=False)
+    tourid = models.CharField(max_length=255, blank=False, null=False)
     user_name_booking = models.TextField(max_length=20, blank=False, null=False)
     user_surname_booking = models.TextField(max_length=20, blank=False, null=False)
     bookingdate = models.DateField(blank=False, null=False)
@@ -71,26 +67,24 @@ class UserRefund(models.Model):
         choices=[('0', 'ยังไม่ดำเนินการ'), ('1', 'ดำเนินการเรียบร้อยแล้ว')]
     )
 
-class ToursDetail(models.Model): #ข้อมูลโปรแกรมทัวร์
+class ToursDetail(models.Model):  # ข้อมูลโปรแกรมทัวร์
     tourid = models.CharField(max_length=255, blank=False, null=False)
     tourcategory = models.CharField(
         max_length=255,
-        choices= [('Promotion', 'Promotion'), ('OneDayTrip', 'One Day Trip'),
+        choices=[('Promotion', 'Promotion'), ('OneDayTrip', 'One Day Trip'),
                 ('WithHostel', 'With Hostel')]
-        )
+    )
     tourname = models.CharField(max_length=255, blank=False, null=False)
-    tourdetail = models.TextField(max_length=500, null=True) 
-    travelplan = models.TextField(max_length=500, null=True)  
-    tourinpackage = models.TextField(max_length=500 , null=True)
-    tournotinpackage = models.TextField(max_length=500, null=True)
-    tourpolicy = models.TextField(max_length=500, null=True)
-    tourprice = models.TextField(max_length=500, null=True)
-    tourimage1 = models.ImageField(upload_to = 'tourimage')
-    tourimage2 = models.ImageField(upload_to = 'tourimage')
+    tourdetail = models.TextField(null=True)
+    travelplan = models.TextField(null=True)
+    tourinpackage = models.TextField(null=True)
+    tournotinpackage = models.TextField(null=True)
+    tourpolicy = models.TextField(null=True)
+    tourprice = models.TextField(null=True)
+    tourimage1 = models.ImageField(upload_to='tourimage')
+    tourimage2 = models.ImageField(upload_to='tourimage')
 
-   
-
-class BlogPage(Page): 
+class BlogPage(Page):
 
     # Database fields
 
